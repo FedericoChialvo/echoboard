@@ -6,6 +6,14 @@ EchoBoard is a proof of concept Accessible AAC (Augmentative and Alternative Com
 
 **Created by Federico Chialvo and Dean Sitton**
 
+## Demo
+
+
+
+https://github.com/user-attachments/assets/3eed0357-6f06-4f61-b152-92723f337a54
+
+
+
 ## Features
 
 - **Symbol-based Communication**: Navigate through categories of symbols (Basic, Emotions, Actions, Custom)
