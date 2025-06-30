@@ -1,0 +1,1453 @@
+:root {
+    --font-multiplier-small: 0.8;
+    --font-multiplier-medium: 1.0;
+    --font-multiplier-large: 1.2;
+    --global-font-size-base: 16px; /* Base font size for calculations if needed */
+    
+    /* Dynamic viewport support for mobile browsers */
+    --vh: 1vh;
+
+    /* Default Theme (Speak & Spell) Colors */
+    --body-bg: #003366;
+    --header-bg: #002244;
+    --header-text: #FFCC00;
+    --header-border: #FFCC00;
+    --main-content-bg: transparent; /* Or a very subtle color if needed */
+    --message-display-bg: #004488;
+    --message-display-border: #FFA500;
+    --message-display-text: #FFFFFF;
+    --message-placeholder-text: #B0C4DE;
+    --input-area-bg: #002244;
+    --input-area-border: #FFCC00;
+    --input-text-bg: #003366;
+    --input-text-color: #FFFFFF;
+    --input-text-border: #FFCC00;
+    --controls-area-bg: #002244;
+    --controls-area-border: #FFCC00;
+    --control-label-text: #FFCC00;
+    --button-primary-bg: #FFCC00;
+    --button-primary-text: #003366;
+    --button-primary-border: #FFA500;
+    --button-secondary-bg: #0055A4;
+    --button-secondary-text: #FFFFFF;
+    --button-secondary-border: #003366;
+    --symbol-bg: #4A90E2; /* Example, will be overridden by individual symbols */
+    --symbol-text: #FFFFFF;
+    --symbol-border: #357ABD;
+    --quick-phrase-bg: #e0e0e0;
+    --quick-phrase-text: #333;
+    --quick-phrase-border: #555;
+    --quick-phrase-button-bg: #f0ad4e;
+    --quick-phrase-button-text: #222;
+    --quick-phrase-button-border: #c08020;
+    --edit-button-bg: #d9534f;
+    --edit-button-text: white;
+    --edit-button-border: #b52b27;
+    --footer-bg: #002244;
+    --footer-border: #FFCC00;
+    --text-general: #FFFFFF;
+    --font-main: 'Luckiest Guy', 'Arial Black', 'Impact', sans-serif;
+}
+
+body, html {
+    height: 100%;
+    height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh if available */
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--body-bg);
+    color: var(--text-general);
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    box-sizing: border-box;
+    position: fixed;
+    width: 100%;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh if available */
+    width: 100%;
+    max-width: 1200px; /* Max width for very large screens */
+    margin: 0 auto; /* Center the app container */
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Optional: subtle shadow for depth */
+    overflow-x: hidden; /* Prevent horizontal overflow */
+    box-sizing: border-box;
+    position: relative;
+}
+
+#header {
+    background-color: var(--header-bg);
+    padding: 15px 20px; /* Increased padding */
+    text-align: center;
+    border-bottom: 3px solid var(--header-border);
+}
+
+#header h1 {
+    margin: 0;
+    font-size: calc(2em * var(--ui-scale, 1)); /* ui-scale for overall scaling if needed, for now use font-multiplier */
+    color: var(--header-text);
+    text-transform: uppercase;
+}
+
+#main-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 
+        "symbols message"
+        "symbols input";
+    flex-grow: 1;
+    padding: 15px;
+    gap: 15px; /* Space between main sections */
+    overflow: hidden; /* Contained scrolling if needed later */
+    background-color: var(--main-content-bg);
+    margin-left: 60px; /* Make room for side controls */
+}
+
+#message-display-area {
+    grid-area: message;
+    background-color: var(--message-display-bg);
+    border: 3px solid var(--message-display-border);
+    padding: 20px; /* Increased padding */
+    border-radius: 8px;
+    font-size: calc(1.8em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    overflow-y: auto; /* Allow scrolling if message is long */
+    min-height: 120px; /* Minimum height */
+    max-height: 200px; /* Maximum height to control size */
+    color: var(--message-display-text);
+}
+
+#input-area {
+    grid-area: input;
+    background-color: var(--input-area-bg);
+    border: 2px solid var(--input-area-border);
+    padding: 15px;
+    border-radius: 8px;
+    display: flex; /* Keep flex for alignment if other elements are added */
+    flex-direction: column; /* Stack elements vertically */
+    max-height: 500px; /* Increased since symbols are now on the side */
+}
+
+#input-area textarea {
+    width: 100%;
+    flex-grow: 1; /* Allow textarea to take available space */
+    background-color: var(--input-text-bg);
+    color: var(--input-text-color);
+    border: 2px solid var(--input-text-border);
+    border-radius: 5px;
+    padding: 12px; /* Increased padding */
+    font-size: calc(1.2em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-family: inherit; /* Use the same font as the body */
+    resize: none; /* Disable manual resizing by user */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+#input-area textarea::placeholder {
+    color: var(--message-placeholder-text);
+    font-style: italic;
+}
+
+/* Side Control Buttons */
+#side-controls {
+    position: fixed;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.side-control-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: 3px solid var(--button-primary-border);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.side-control-button:hover {
+    background-color: var(--button-primary-border);
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.side-control-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.side-control-button:focus {
+    outline: 3px solid #FFCC00;
+    outline-offset: 2px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: var(--input-area-bg);
+    border: 3px solid var(--input-area-border);
+    border-radius: 12px;
+    max-width: 90%;
+    max-height: 90%;
+    width: 500px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    animation: modalSlideIn 0.3s ease;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--header-border);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: calc(1.4em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    color: var(--header-text);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--header-text);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 204, 0, 0.2);
+}
+
+.modal-close:focus {
+    outline: 2px solid #FFCC00;
+    outline-offset: 2px;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Modal Animations */
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Quick Phrases Grid in Modal */
+#quick-phrases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    padding: 10px 0;
+}
+
+#quick-phrases-grid .quick-phrase-button {
+    margin: 0; /* Remove default margin since we're using grid gap */
+}
+
+/* Button Group for Font Size Controls */
+.button-group {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+/* Update control groups for modal layout */
+.modal-body .control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.modal-body .control-group label {
+    margin-bottom: 8px;
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    color: var(--control-label-text);
+    font-weight: bold;
+}
+
+.modal-body .control-group select,
+.modal-body .control-group input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 2px solid var(--input-text-border);
+    background-color: var(--message-display-bg);
+    color: var(--input-text-color);
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+}
+
+.modal-body .control-group input[type="range"] {
+    padding: 0;
+}
+
+/* Update Add Symbol Form for Modal */
+.modal-body #add-symbol-form-container {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    margin-bottom: 0;
+}
+
+.modal-body #add-symbol-form-container h3 {
+    display: none; /* Title is already in modal header */
+}
+
+.modal-body #add-symbol-form-container div {
+    margin-bottom: 15px;
+}
+
+.modal-body #add-symbol-form-container label {
+    color: var(--control-label-text);
+    margin-bottom: 5px;
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    display: block;
+}
+
+.modal-body #add-symbol-form-container input[type="text"],
+.modal-body #add-symbol-form-container input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--input-text-border);
+    border-radius: 5px;
+    background-color: var(--input-text-bg);
+    color: var(--input-text-color);
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    box-sizing: border-box;
+}
+
+#add-symbol-button {
+    width: 100%;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: 2px solid var(--button-primary-border);
+    padding: 12px 20px;
+    font-size: calc(1.1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+#add-symbol-button:hover {
+    background-color: var(--button-primary-border);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Remove old controls area styles */
+#controls-area {
+    display: none;
+}
+
+/* Remove old quick phrases container styles */
+#quick-phrases-container {
+    display: none;
+}
+
+/* Update message editing controls to include speak button */
+#message-editing-controls {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#message-editing-controls button {
+    background-color: #d9534f;
+    color: white;
+    border: 2px solid #b52b27;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 100px;
+}
+
+#speak-button {
+    background-color: var(--button-primary-bg) !important;
+    color: var(--button-primary-text) !important;
+    border-color: var(--button-primary-border) !important;
+}
+
+#message-editing-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#speak-button:hover {
+    background-color: var(--button-primary-border) !important;
+}
+
+#message-editing-controls button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body, html {
+        font-size: 14px; /* Smaller base font for mobile */
+        width: 100vw;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh for mobile browsers */
+        overflow-x: hidden;
+        position: fixed; /* Prevent scrolling issues on mobile */
+    }
+    
+    #app-container {
+        max-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh for mobile browsers */
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #header {
+        padding: 8px 15px;
+        flex-shrink: 0;
+    }
+    
+    #header h1 {
+        font-size: calc(1.3em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+    
+    #main-content {
+        margin-left: 0;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        overflow-x: hidden;
+        flex: 1;
+        min-height: 0; /* Allow flex children to shrink */
+    }
+    
+    #message-display-area {
+        min-height: 60px;
+        max-height: 100px;
+        padding: 10px;
+        font-size: calc(1.2em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        overflow-y: auto;
+        flex-shrink: 0;
+        order: 1;
+    }
+    
+    #input-area {
+        padding: 8px;
+        max-height: none;
+        flex-shrink: 0;
+        order: 2;
+    }
+    
+    #input-area textarea {
+        font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 8px;
+        min-height: 50px;
+        resize: none;
+    }
+    
+    #symbol-grid-container {
+        width: 100%;
+        padding: 8px;
+        margin-top: 0;
+        overflow-y: auto;
+        max-height: 40vh;
+        flex-shrink: 1;
+        order: 3;
+        position: relative;
+    }
+    
+    #symbol-grid-container.collapsed {
+        display: none; /* Completely hide on mobile when collapsed */
+    }
+    
+
+    
+    #side-controls {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        flex-direction: row;
+        justify-content: center;
+        padding: 6px;
+        background-color: var(--header-bg);
+        border-bottom: 2px solid var(--header-border);
+        gap: 6px;
+        flex-shrink: 0;
+        width: 100%;
+        box-sizing: border-box;
+        order: 0;
+    }
+    
+    .side-control-button {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+    
+    .modal-content {
+        width: 95vw;
+        max-width: 95vw;
+        margin: 5px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-body {
+        padding: 12px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    #message-editing-controls {
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 6px;
+        margin-bottom: 8px;
+    }
+    
+    #message-editing-controls button {
+        flex: none;
+        width: 100%;
+        padding: 10px 12px;
+        font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+
+    .category-tab {
+        font-size: calc(0.7em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 4px 8px;
+        min-width: 50px;
+    }
+    
+    #symbol-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .symbol-item {
+        font-size: calc(0.8em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 4px;
+        min-height: 60px;
+    }
+    
+    .symbol-item img {
+        max-width: 45%;
+        max-height: 45%;
+        margin-bottom: 2px;
+    }
+    
+    .symbol-item .symbol-text {
+        font-size: 0.6em;
+        line-height: 1em;
+        max-height: 2em;
+    }
+    
+    /* On-screen keyboard adjustments for mobile */
+    #on-screen-keyboard {
+        margin-top: 8px;
+        gap: 2px;
+    }
+    
+    .keyboard-row {
+        gap: 2px;
+    }
+    
+    .keyboard-key {
+        padding: 6px 2px;
+        font-size: calc(0.8em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        min-width: 25px;
+        height: 30px;
+        border-radius: 3px;
+    }
+    
+    #footer {
+        padding: 4px 10px;
+        font-size: calc(0.6em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        flex-shrink: 0;
+    }
+    
+    /* Ensure proper text wrapping */
+    * {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+}
+
+/* Additional mobile adjustments for very small screens */
+@media (max-width: 480px) {
+    body, html {
+        overflow-x: hidden;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh for mobile browsers */
+    }
+    
+    #app-container {
+        width: 100vw;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Use dynamic vh for mobile browsers */
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #main-content {
+        padding: 3px;
+        gap: 3px;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #message-display-area {
+        padding: 8px;
+        min-height: 50px;
+        max-height: 80px;
+        font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        flex-shrink: 0;
+        order: 1;
+    }
+    
+    #input-area {
+        padding: 6px;
+        flex-shrink: 0;
+        order: 2;
+    }
+    
+    #input-area textarea {
+        min-height: 40px;
+        padding: 6px;
+        font-size: calc(0.9em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+    
+    #symbol-grid-container {
+        max-height: 35vh;
+        padding: 6px;
+        flex-shrink: 1;
+        order: 3;
+        position: relative;
+    }
+    
+    #symbol-grid {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 4px;
+        max-height: 150px;
+    }
+    
+    .symbol-item {
+        min-height: 50px;
+        font-size: calc(0.7em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 3px;
+    }
+    
+    .symbol-item img {
+        max-width: 40%;
+        max-height: 40%;
+    }
+    
+    .symbol-item .symbol-text {
+        font-size: 0.5em;
+    }
+    
+    .category-tab {
+        padding: 3px 6px;
+        font-size: calc(0.6em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        min-width: 40px;
+    }
+    
+    .keyboard-key {
+        min-width: 22px;
+        height: 28px;
+        padding: 4px 1px;
+        font-size: calc(0.7em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+    
+    .side-control-button {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+    
+
+    
+    #message-editing-controls button {
+        padding: 8px 10px;
+        font-size: calc(0.9em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+    
+    #side-controls {
+        padding: 4px;
+        gap: 4px;
+        order: 0;
+        flex-shrink: 0;
+    }
+    
+    #header {
+        padding: 6px 10px;
+        flex-shrink: 0;
+    }
+    
+    #header h1 {
+        font-size: calc(1.1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    }
+    
+    #footer {
+        padding: 3px 8px;
+        font-size: calc(0.5em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        flex-shrink: 0;
+    }
+    
+    /* Ensure no horizontal overflow */
+    #on-screen-keyboard {
+        overflow-x: hidden;
+    }
+    
+    .keyboard-row {
+        overflow-x: hidden;
+    }
+}
+
+/* High contrast and accessibility improvements for modals */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border-width: 4px;
+    }
+    
+    .modal-close:focus {
+        outline-width: 3px;
+    }
+}
+
+/* Reduced motion support for modals */
+@media (prefers-reduced-motion: reduce) {
+    .modal.show {
+        animation: none;
+    }
+    
+    .modal-content {
+        animation: none;
+    }
+    
+    .side-control-button:hover {
+        transform: none;
+    }
+    
+    #add-symbol-button:hover,
+    #message-editing-controls button:hover {
+        transform: none;
+    }
+}
+
+/* For better full-screen experience, consider removing if header/footer are always visible */
+/*
+body, html {
+    height: 100vh;
+    width: 100vw;
+}
+#app-container {
+    height: 100vh;
+    width: 100vw;
+    max-width: none;
+}
+*/
+
+#on-screen-keyboard {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center rows if they don't fill width */
+    gap: 5px; /* Space between keyboard rows */
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center; /* Center keys within a row */
+    gap: 5px; /* Space between keys in a row */
+    width: 100%; /* Allow rows to use available width */
+}
+
+.keyboard-key {
+    background-color: var(--message-display-bg);
+    color: var(--message-display-text);
+    border: 2px solid var(--input-text-border);
+    border-radius: 5px;
+    padding: 10px;
+    font-size: calc(1.1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 40px; /* Minimum width for keys */
+    height: 40px; /* Fixed height for keys */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.1s, transform 0.1s;
+    flex-grow: 1; /* Allow keys to grow to fill space in row */
+    flex-basis: 0; /* Distribute space evenly */
+}
+
+.keyboard-key:hover {
+    background-color: var(--button-secondary-bg);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--input-text-border) 70%, transparent);
+}
+
+.keyboard-key:active {
+    background-color: #FFA500; /* Orange on active, like Speak button */
+    color: #002244;
+    transform: scale(0.95);
+}
+
+.key-space {
+    flex-grow: 6; /* Make spacebar wider */
+}
+
+.key-backspace {
+    flex-grow: 2; /* Make backspace a bit wider */
+    background-color: #CC3333; /* Reddish tint for Backspace */
+    border-color: #FF6347; /* Lighter red border */
+}
+
+.key-backspace:hover {
+    background-color: #DD4444;
+}
+
+#add-symbol-form-container {
+    background-color: var(--input-area-bg);
+    padding: 15px;
+    border: 2px solid var(--input-area-border);
+    border-radius: 8px;
+    margin-bottom: 15px; /* Space before the symbol grid */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#add-symbol-form-container h3 {
+    color: var(--control-label-text);
+    margin: 0 0 5px 0;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+#add-symbol-form-container div {
+    display: flex;
+    flex-direction: column;
+}
+
+#add-symbol-form-container label {
+    color: #FFFFFF; /* White text for labels */
+    margin-bottom: 3px;
+    font-size: 0.9em;
+}
+
+#add-symbol-form-container input[type="text"] {
+    padding: 8px;
+    border: 1px solid var(--input-text-border);
+    border-radius: 4px;
+    background-color: var(--input-text-bg);
+    color: var(--input-text-color);
+    font-size: 1em;
+}
+
+#add-symbol-form-container input[type="text"]::placeholder {
+    color: #B0C4DE; /* Lighter blue for placeholder */
+    font-style: italic;
+}
+
+#add-symbol-button {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: 2px solid var(--button-secondary-border);
+    padding: 8px 15px;
+    font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    align-self: center; /* Center the button */
+    margin-top: 5px;
+}
+
+#add-symbol-button:hover {
+    background-color: #FFC14D; /* Lighter orange on hover */
+}
+
+#symbol-grid-container {
+    grid-area: symbols;
+    background-color: var(--input-area-bg);
+    border: 2px solid var(--input-area-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 0; /* Remove margin since we're using grid */
+    width: 400px; /* Fixed width for left panel */
+    transition: width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
+    overflow: hidden;
+}
+
+#symbol-grid-container.collapsed {
+    width: 0px;
+    padding: 0;
+    margin-left: -417px; /* Hide completely by moving left (width + border + gap) */
+    border: none;
+    opacity: 0;
+}
+
+/* The symbols toggle button now uses the same styling as other side control buttons */
+
+.symbol-item {
+    background-color: #004488; /* Default background, will be overridden by JS inline style */
+    color: #FFFFFF; /* White text for symbol display (e.g., S1) */
+    border: 2px solid #FFA500; /* Orange accent border */
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    aspect-ratio: 1 / 1; /* Make items square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.symbol-item:hover {
+    background-color: #FFB732; /* Lighter orange on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow on hover for depth */
+}
+
+.symbol-item:active {
+    background-color: #EE9A00; /* Darker orange on click */
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Slightly less shadow on click */
+}
+
+#quick-phrases-container {
+    padding: 15px;
+    margin: 10px;
+    background-color: #e0e0e0; /* Light grey, similar to some Speak & Spell areas */
+    border-radius: 8px;
+    border: 2px solid #555; /* A slightly softer border */
+    text-align: center;
+}
+
+#quick-phrases-container h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333; /* Dark text for readability */
+    font-size: 1.4em;
+}
+
+.quick-phrase-button {
+    background-color: #f0ad4e; /* Speak & Spell orange/yellow */
+    color: #222; /* Dark text on buttons */
+    border: 2px solid #c08020; /* Darker orange border */
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.quick-phrase-button:hover {
+    background-color: #ec971f; /* Slightly darker on hover */
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.quick-phrase-button:active {
+    background-color: #d58512; /* Darker on active/click */
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#message-editing-controls {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: center; /* Center the buttons */
+}
+
+#message-editing-controls button {
+    background-color: #d9534f; /* A reddish tone for delete/clear actions */
+    color: white;
+    border: 2px solid #b52b27;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+#message-editing-controls button:hover {
+    background-color: #c9302c;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+#message-editing-controls button:active {
+    background-color: #ac2925;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    transform: translateY(1px);
+}
+
+/* Font Size and Theme Controls */
+#font-size-controls button,
+#theme-toggle-button {
+    background-color: #0055A4; /* A different blue to distinguish from action buttons */
+    color: #FFFFFF;
+    border: 2px solid #003366; /* Darker blue border */
+    padding: 5px 10px;
+    margin: 0 3px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: normal; /* Normal weight for these utility buttons */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#font-size-controls button:hover,
+#theme-toggle-button:hover {
+    background-color: #0066CC; /* Lighter blue on hover */
+    transform: translateY(-1px);
+}
+
+#font-size-controls button:active,
+#theme-toggle-button:active {
+    background-color: #004488; /* Darker blue on active */
+    transform: translateY(0px);
+}
+
+#font-size-controls button.active-font-size {
+    background-color: #FFCC00; /* Yellow to indicate active size */
+    color: #003366;
+    border-color: #FFA500;
+}
+
+/* Ensure main content area can scroll if needed */
+
+/* Screen reader only content */
+.screen-reader-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus indicators for better accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid #FFCC00;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #003366, 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+/* High contrast focus for keyboard navigation */
+*:focus-visible {
+    outline: 3px solid #FFCC00 !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #003366, 0 0 8px rgba(255, 204, 0, 0.5) !important;
+}
+
+/* Category navigation tabs */
+#symbol-category-nav {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--controls-area-bg);
+    border: 2px solid var(--controls-area-border);
+    border-radius: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: 2px solid var(--button-secondary-border);
+    padding: 8px 15px;
+    font-size: calc(0.9em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    text-align: center;
+}
+
+.category-tab:hover {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.category-tab:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.category-tab.active {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border-color: var(--button-primary-border);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.category-tab.active:hover {
+    background-color: var(--button-primary-border);
+    transform: none;
+}
+
+/* Symbol grid title */
+#symbol-grid-title {
+    color: var(--control-label-text);
+    text-align: center;
+    margin: 10px 0;
+    font-size: calc(1.4em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+}
+
+/* Update symbol grid container to work with new structure */
+#symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    overflow-y: auto; /* In case of many symbols */
+    max-height: 300px; /* Limit height to prevent overflow */
+}
+
+/* Enhanced symbol items with image support */
+.symbol-item {
+    background-color: #004488; /* Default background, will be overridden by JS inline style */
+    color: #FFFFFF; /* White text for symbol display (e.g., S1) */
+    border: 2px solid #FFA500; /* Orange accent border */
+    border-radius: 5px;
+    padding: 10px;
+    font-size: calc(1.2em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    font-weight: bold;
+    cursor: pointer;
+    aspect-ratio: 1 / 1; /* Make items square */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.symbol-item img {
+    max-width: 60%;
+    max-height: 60%;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.symbol-item .symbol-text {
+    font-size: 0.8em;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 2.4em; /* Approximately 2 lines */
+    line-height: 1.2em;
+}
+
+.symbol-item:hover {
+    background-color: #FFB732; /* Lighter orange on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow on hover for depth */
+}
+
+.symbol-item:active {
+    background-color: #EE9A00; /* Darker orange on click */
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Slightly less shadow on click */
+}
+
+/* File input styling */
+#add-symbol-form-container input[type="file"] {
+    padding: 8px;
+    border: 2px dashed var(--input-text-border);
+    border-radius: 4px;
+    background-color: var(--input-text-bg);
+    color: var(--input-text-color);
+    font-size: calc(0.9em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+#add-symbol-form-container input[type="file"]:hover {
+    border-color: var(--button-primary-bg);
+    background-color: rgba(255, 204, 0, 0.1);
+}
+
+#add-symbol-form-container input[type="file"]:focus {
+    border-color: var(--button-primary-bg);
+    background-color: rgba(255, 204, 0, 0.2);
+}
+
+/* Image preview for uploaded files */
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid var(--input-text-border);
+    margin-top: 10px;
+    display: block;
+}
+
+/* Enhanced keyboard navigation for on-screen keyboard */
+.keyboard-key:focus {
+    background-color: var(--button-primary-bg) !important;
+    color: var(--button-primary-text) !important;
+    transform: scale(1.05);
+}
+
+/* Improved focus states for all interactive elements */
+.quick-phrase-button:focus,
+.symbol-item:focus,
+.category-tab:focus {
+    outline: 3px solid #FFCC00;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #003366, 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+/* Dark theme adjustments for accessibility */
+.theme-dark .screen-reader-only {
+    /* Screen reader only elements don't need dark theme changes */
+}
+
+.theme-dark *:focus-visible {
+    outline-color: #FFD700 !important;
+    box-shadow: 0 0 0 2px #1a1a1a, 0 0 8px rgba(255, 215, 0, 0.5) !important;
+}
+
+/* Ensure adequate contrast in dark theme */
+.theme-dark .category-tab {
+    border-color: #555;
+}
+
+.theme-dark .category-tab:hover {
+    background-color: #FFD700;
+    color: #1a1a1a;
+}
+
+.theme-dark .category-tab.active {
+    background-color: #FFD700;
+    color: #1a1a1a;
+    border-color: #FFA500;
+}
+
+/* Loading state for symbols */
+.symbol-item.loading {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.symbol-item.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments for accessibility */
+@media (max-width: 768px) {
+    .category-tab {
+        font-size: calc(0.8em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 6px 10px;
+        min-width: 60px;
+    }
+    
+    #symbol-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+    
+    .symbol-item {
+        font-size: calc(1em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+        padding: 8px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --button-primary-bg: #FFFF00;
+        --button-primary-text: #000000;
+        --input-text-border: #FFFFFF;
+        --message-display-border: #FFFFFF;
+    }
+    
+    button:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: 4px solid #FFFF00;
+        outline-offset: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .symbol-item,
+    .category-tab,
+    .keyboard-key,
+    .quick-phrase-button {
+        transition: none;
+    }
+    
+    .symbol-item:hover,
+    .category-tab:hover,
+    .keyboard-key:hover,
+    .quick-phrase-button:hover {
+        transform: none;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(0deg); }
+    }
+}
+
+.control-group input[type="range"] {
+    padding: 0; /* Remove padding for range inputs to look better */
+}
+
+/* Styling for slider thumbs - webkit browsers */
+.control-group input[type="range"]::-webkit-slider-thumb,
+.modal-body .control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: var(--message-display-border); /* Orange/Cyan thumb */
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid var(--input-text-border);
+}
+
+/* Styling for slider thumbs - mozilla browsers */
+.control-group input[type="range"]::-moz-range-thumb,
+.modal-body .control-group input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: var(--message-display-border);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid var(--input-text-border);
+}
+
+#footer {
+    background-color: var(--footer-bg);
+    padding: 8px 20px;
+    text-align: center;
+    font-size: calc(0.8em * var(--current-font-multiplier, var(--font-multiplier-medium)));
+    border-top: 2px solid var(--footer-border);
+    color: var(--text-general);
+} 
